@@ -5,6 +5,9 @@
 {% endblock %}
 
 {% block body %}
+{% if message %}
+    <div class="alert alert-danger">{{ message }}</div>
+{% endif %}
     <h1>All Pages</h1>
 
     <ul>
