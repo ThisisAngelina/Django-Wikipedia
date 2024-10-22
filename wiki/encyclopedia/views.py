@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect 
 import re
+import random
 import markdown2
 from django.http import Http404
 
@@ -77,11 +78,23 @@ def create_entry(request):
             return render(request, 'encyclopedia/create_entry.html', {'message' : message})
         else: #if all goes well - save the entry and redirect the user to the new entry’s page.
             util.save_entry(title,content)
-            print("the title is", title)
             return redirect('read_entry', title=title)
     #if the request method is GET and the user just wants to see the form
     else:
         return render(request, 'encyclopedia/create_entry.html')
+
+
+# edit existing entries
+
+# access a random entry
+def read_random(request):
+    existing_entries = util.list_entries()
+    index = random.randint(0, len(existing_entries)-1)
+    chosen_entry = existing_entries[index]
+    print("the title of the chosen entry is", chosen_entry)
+    md = util.get_entry(chosen_entry) #get title from the url, use the pre-made function to obtain the requested entry from the set of existing entries .
+    content = markdown2.markdown(md)# convert md into HTML using markdown2. NOTE had to add the 'safe' ttribute to my DTL variable 'content' to have the HTML template render the HTML correctly
+    return render(request, "encyclopedia/read_entry.html", {'content': content, 'title': chosen_entry})
 
 
 def custom_404(request, exception): #custom 404 that adheres to the style of the website and is not the standard (ugly) 404 page.
