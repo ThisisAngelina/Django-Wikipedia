@@ -58,13 +58,32 @@ def search(request):
             
 
 
+#allow users to create and save their own wiki entries
+def create_entry(request):
+    #if the form has been submitted:
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        content =  request.POST.get('content')
+        #preparing the list of existing enty titles (needed to ensure that the user does not create a duplicate of an existing entry)
+        existing_titles = util.list_entries()
+        print('existing titles are', existing_titles)
+        #if the entry title or the entry content are missing, redirect the user to the same page with a message
+        if not title or not content:
+            message = "Oops! An entry title and content are required!"
+            return render(request, 'encyclopedia/create_entry.html', {'message' : message})
+        #if an encyclopedia entry already exists with the provided title, the user is presented with an error message and is redirected back to same page to try submitting the form again
+        elif title in existing_titles:
+            message = "Oops! An entry with this title already exists!"
+            return render(request, 'encyclopedia/create_entry.html', {'message' : message})
+        else: #if all goes well - save the entry and redirect the user to the new entry’s page.
+            util.save_entry(title,content)
+            print("the title is", title)
+            return redirect('read_entry', title=title)
+    #if the request method is GET and the user just wants to see the form
+    else:
+        return render(request, 'encyclopedia/create_entry.html')
+
+
 def custom_404(request, exception): #custom 404 that adheres to the style of the website and is not the standard (ugly) 404 page.
     return render(request, '404.html', {'message': str(exception)}, status=404)
 
-'''
-
-def get_context_data(self, **kwargs): #passing a custom message (needed when the searched term did not match an existing entry)
-    context = super().get_context_data(**kwargs)
-    context["message"] = kwargs.get("message", "")
-    return context
-'''
