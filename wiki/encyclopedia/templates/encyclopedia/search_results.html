@@ -1,0 +1,16 @@
+{% extends "encyclopedia/layout.html" %}
+
+{% block title %}
+    Search results
+{% endblock %}
+
+{% block body %}
+    <h1>Are you looking for one of these?</h1>
+
+    <ul>
+        {% for entry in matched_entries %}
+            <li><a class="link-primary" href="{% url 'read_entry' entry %}">{{ entry }}</a></li>
+        {% endfor %}
+    </ul>
+
+{% endblock %}

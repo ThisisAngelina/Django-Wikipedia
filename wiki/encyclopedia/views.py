@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 import re
 import random
 import markdown2
+from django.contrib import messages
 from django.http import Http404
 
 from . import util
@@ -85,6 +86,29 @@ def create_entry(request):
 
 
 # edit existing entries
+def edit_entry(request, title):
+
+    #if the user has saved the form:
+    if request.method == 'POST':
+        
+        #obtain the new values of the title and content
+        title = request.POST.get('title')
+        content = request.POST.get('content')
+
+        #if the entry title or the entry content are missing, redirect the user to the same page with a message
+        if not title or not content:
+            message = "Oops! An entry title and content are required!"
+            return render(request, 'encyclopedia/edit_entry.html', {'message' : message, 'title': title, 'content': content}) 
+        
+        else: #if all goes well - save the entry and redirect the user to the entry’s page and show a success message
+            util.save_entry(title,content)
+            messages.success(request, 'Entry updated successfully')
+            return redirect('read_entry', title=title)
+
+    #if the user is not submitting the form but is just accessing the page: render the template pre-populating the form with data - use the MARKDOWN format, so that the user can edit it 
+    else:
+        content = util.get_entry(title) #get title from the url, use the pre-made function to obtain the requested entry from the set of existing entries .
+        return render(request, "encyclopedia/edit_entry.html", {'title': title, 'content': content})
 
 # access a random entry
 def read_random(request):

@@ -1,0 +1,22 @@
+{% extends "encyclopedia/layout.html" %}
+
+{% block title %}
+    {{title|safe}}
+{% endblock %}
+
+{% block body %}
+
+{% if messages %}
+  <ul>
+    {% for message in messages %}
+      <li class="{{ message.tags }}">{{ message }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+{{content|safe}}
+
+<div>
+<button class="btn btn-light mt-3"><a href="{% url 'edit_entry' title %}">Edit</a></button>
+</div>
+{% endblock %}
